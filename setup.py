@@ -15,7 +15,9 @@ setup(name='motel',
       python_requires='>=3',
       packages=find_packages(exclude=['ftest', 'test']),
       install_requires=[
-        'gensim>=3'
+        'gensim>=3',
+        'spacy>=2.1.3',
+        'tqdm>=4.31.1'
       ],
       entry_points={
         'console_scripts': ['motel=motel.cli.__main__:main']
