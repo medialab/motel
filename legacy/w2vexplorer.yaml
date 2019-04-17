@@ -1,0 +1,291 @@
+######## analisys ######################################
+###########################################################
+
+
+script:
+  name: W2Vexplorer.py
+  desc: Exploring Copora with Word2Vec Embedding
+  type: data exploration
+  author: 'jean-philippe cointet'
+  tags: ['table','filter','interface']
+  documentation: http://docs.cortext.net/W2Vexplorer
+  inputs:
+   -
+      type: db
+      structure: reseaulu
+      type: sqlite
+
+  outputs:
+    -
+      type: json
+      name: visu
+      structure: protovis
+  outputs:
+    -
+      type: gexf
+      name: visu
+      structure: sigma
+      
+############## Paramètres du scripts (construction du formulaire utilisateur et variables renvoyées aux script) ############
+##
+section:
+  sect1:
+    label: Word Embedding Model
+    order: 1
+    required: yes
+    opened: yes
+    params:
+      tablename:
+        label: Field
+        help: Select the field you wish to explore
+        type: list
+        required: yes
+        widget:     
+          source: descriptor
+          multiple: no
+          expanded: yes
+          choices: totaltables
+      advancedmodel:
+        label: Tune model parameters
+        help: Tune model parameters
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      min_count:
+        label: Minimum Frequency
+        parent: advancedmodel
+        value: yes
+        help: Minimum frequency of words in the vocabulary
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '5'
+          hide: no
+      max_vocab_size:
+        label: Maximum Size of the Vocabulary
+        parent: advancedmodel
+        value: yes
+        help: Maximum Size of the Vocabulary
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '999999'
+          hide: no
+      window_size:
+        label: Size of the Window
+        parent: advancedmodel
+        value: yes
+        help: Size of the Window
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '10'
+          hide: no
+      modeldimensions:
+        label: Model Dimensions
+        parent: advancedmodel
+        value: yes
+        help: Model Dimensions
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '100'
+          hide: no
+      iteration:
+        label: Number of iterations to train the model
+        parent: advancedmodel
+        value: yes
+        help: Number of iterations to train the model
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '5'
+          hide: no
+      force_recompute:
+        label: Recompute the model
+        parent: advancedmodel
+        value: yes
+        help: Force the system to recompute the model even if a former version of the same model existed beforehand
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      nbworkers:
+        label: Number of workers to use
+        parent: advancedmodel
+        value: yes
+        help: Define the number of workers learning the model (maximum is 3)
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '2'
+          hide: no
+      # gensimmodel:
+      #   label: Word2Vec or Doc2Vec
+      #   parent: advancedmodel
+      #   value: yes
+      #   help: Choose the type of model used, only words (Word2Vec) or words and documents (Doc2Vec)
+      #   type: list
+      #   required: yes
+      #   widget:
+      #     source: list
+      #     multiple: no
+      #     expanded: yes
+      #     choices: ['Word2Vec','Doc2Vec']
+      #     default: 'Word2Vec'
+  sect2:
+    label: Text Processing Method
+    order: 2
+    required: yes
+    opened: no
+    params:
+      cut_sentences:
+        label: Train at the sentence level
+        help: Sentences will be first tokenized
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      bigramactivated:
+        label: Find Bigrams
+        help: Bigrams will be detected based on colocation score
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      trigramactivated:
+        label: Find Trigrams
+        help: Trigrams will be detected based on colocation score
+        parent: bigramactivated
+        value: yes
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      trigramactivated:
+        label: Find Trigrams
+        help: Trigrams will be detected based on colocation score
+        parent: bigramactivated
+        value: yes
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      bigram_threshold:
+        label: Score Threshold for finding bigrams
+        help: Score Threshold for finding bigrams (higher score will be more stringent)
+        parent: bigramactivated
+        value: yes
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '100'
+          hide: no
+      min_len:
+        label: Minimum word length
+        help: Minimum word length
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '2'
+          hide: no
+      remove_accent:
+        label: Remove Accents
+        help: Remove Accents
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+      lemmatization:
+        label: Lemmatize words
+        help: Lemmatize words (possibly longer process)
+        type: list
+        required: yes
+        widget: 
+          source: list
+          multiple: no
+          expanded: yes
+          choices: [yes, no]
+          default: no
+  sect3:
+    label: Visualization
+    order: 3
+    required: yes
+    opened: no
+    params:      
+      sizemap:
+        label: Size of the final map
+        help: Number of words in the final map (max 5000)
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '1000'
+          hide: no
+      clustering_space:
+        label: Clustering Space
+        help: Apply HDBScan clustering on the original Word2Vec embeded space (using cosine distance) or on the resulting 2d t-SNE projection (using euclidean distance)
+        type: list
+        required: yes
+        widget:
+          source: list
+          multiple: no
+          expanded: yes
+          choices: ['W2V','t-SNE']
+          default: 'W2V'
+      min_cluster_size:
+        label: Minium Cluster Size 
+        label: Minimal Size of Clusters
+        help: Minimal Size of Clusters (HDBScan setting)
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '10'
+          hide: no
+      min_samples:
+        label: Minium Sample Size 
+        help: Minimal Sample (HDBScan setting)
+        type: string
+        required: yes
+        widget:
+          source: no
+          default: '1'
+          hide: no
