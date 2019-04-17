@@ -6,3 +6,4 @@ twine==1.11.0
 
 # Dependencies
 gensim==3.7.1
+spacy==2.1.3
