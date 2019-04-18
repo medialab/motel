@@ -16,6 +16,7 @@ from gensim.utils import deaccent
 from motel.cli.utils import custom_reader
 
 OUTPUT_HEADERS = ['id', 'tokens']
+VOCAB_HEADERS = ['word', 'count']
 
 
 def filter_token(token):
@@ -82,7 +83,7 @@ def preprocess_action(namespace):
     print('Writing vocabulary...')
     with open(join(namespace.output, 'vocab.csv'), 'w') as vf:
         writer = csv.writer()
-        writer.writerow(['word', 'count'])
+        writer.writerow(VOCAB_HEADERS)
 
         for item, count in vocab.most_common():
             writer.writerow([item, count])
