@@ -17,29 +17,35 @@ def main():
     parser = ArgumentParser(prog='motel')
     subparsers = parser.add_subparsers(help='action to execute', title='actions', dest='action')
 
-    preprocess = subparsers.add_parser('preprocess', description='Preprocess the given corpus by splitting sentences and filtering tokens etc.')
-    preprocess.add_argument(
+    preprocess_subparser = subparsers.add_parser('preprocess', description='Preprocess the given corpus by splitting sentences and filtering tokens etc.')
+    preprocess_subparser.add_argument(
         'column',
         help='column'
     )
-    preprocess.add_argument(
+    preprocess_subparser.add_argument(
         'file',
         help='csv file to cluster',
         type=FileType('r'),
         default=sys.stdin,
         nargs='?'
     )
-    preprocess.add_argument('-o',
+    preprocess_subparser.add_argument('-o',
         '--output',
         help='output file',
         default='./corpus'
     )
-    preprocess.add_argument('-t',
+    preprocess_subparser.add_argument(
+        '-p', '--processes',
+        help='Number of processes to use. Defaults to 4.',
+        type=int,
+        default=4
+    )
+    preprocess_subparser.add_argument('-t',
         '--total',
         help='Total number of documents. Necessary if you want to display a finite progress indicator.',
         type=int
     )
-    SUBPARSERS['preprocess'] = preprocess
+    SUBPARSERS['preprocess'] = preprocess_subparser
 
     args = parser.parse_args()
 
