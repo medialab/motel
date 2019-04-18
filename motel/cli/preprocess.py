@@ -8,6 +8,7 @@
 #
 import os
 import csv
+import json
 import spacy
 from collections import Counter
 from multiprocessing import Pool
@@ -100,6 +101,8 @@ def preprocess_action(namespace):
 
     generator = ((i, line[pos], line) for i, line in enumerate(reader))
 
+    total_sentences = 0
+
     for i, line, sentences, vocab in pool.imap_unordered(worker, generator):
         loading_bar.update()
 
@@ -108,6 +111,7 @@ def preprocess_action(namespace):
             break
 
         full_vocab += vocab
+        total_sentences += len(sentences)
 
         for tokens in sentences:
             writer.writerow([i, '§'.join(tokens)])
@@ -122,3 +126,9 @@ def preprocess_action(namespace):
 
         for item, count in full_vocab.most_common():
             writer.writerow([item, count])
+
+    # Outputting stats
+    with open(join(namespace.output, 'stats.json'), 'w') as stf:
+        json.dump({
+            'sentences': total_sentences
+        }, stf)

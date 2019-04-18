@@ -8,8 +8,6 @@
 import sys
 from argparse import ArgumentParser, FileType
 
-from motel.cli.preprocess import preprocess_action
-
 SUBPARSERS = {}
 
 
@@ -17,6 +15,7 @@ def main():
     parser = ArgumentParser(prog='motel')
     subparsers = parser.add_subparsers(help='action to execute', title='actions', dest='action')
 
+    # Preprocess subparser
     preprocess_subparser = subparsers.add_parser('preprocess', description='Preprocess the given corpus by splitting sentences and filtering tokens etc.')
     preprocess_subparser.add_argument(
         'column',
@@ -52,6 +51,14 @@ def main():
     )
     SUBPARSERS['preprocess'] = preprocess_subparser
 
+    # Train subparser
+    train_subparser = subparsers.add_parser('train', description='Train the given corpus to extract word vectors.')
+    train_subparser.add_argument(
+        'corpus',
+        help='Corpus directory'
+    )
+    SUBPARSERS['train'] = train_subparser
+
     args = parser.parse_args()
 
     if args.action == 'help':
@@ -63,7 +70,14 @@ def main():
             target_subparser.print_help()
 
     elif args.action == 'preprocess':
+        from motel.cli.preprocess import preprocess_action
+
         preprocess_action(args)
+
+    elif args.action == 'train':
+        from motel.cli.train import train_action
+        
+        train_action(args)
 
     else:
         parser.print_help()
