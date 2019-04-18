@@ -42,7 +42,8 @@ def preprocess_action(namespace):
 
     os.makedirs(namespace.output, exist_ok=True)
 
-    writer = csv.writer(join(namespace.output, 'sentences.csv'))
+    sf = open(join(namespace.output, 'sentences.csv'), 'w')
+    writer = csv.writer(sf)
     writer.writerow(OUTPUT_HEADERS)
 
     loading_bar = tqdm(
@@ -74,6 +75,8 @@ def preprocess_action(namespace):
 
             # Outputting a sentence
             writer.writerow([i, '§'.join(tokens)])
+
+    sf.close()
 
     # Outputting vocabulary
     print('Writing vocabulary...')
