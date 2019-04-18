@@ -47,3 +47,6 @@ def train_action(namespace):
         sentences = (line[1].split('§') for line in reader)
 
         model.train(sentences, total_examples=stats['sentences'], epochs=5)
+
+    print('Saving vectors...')
+    model.wv.save(join(namespace.corpus, 'vectors.kv'))
