@@ -6,9 +6,13 @@
 # corpus so we can apply word2vec on it later. Typically, here we deal with
 # sentence segmentation, tokenization, lemmatization etc.
 #
+import os
 import csv
 import spacy
+from collections import Counter
+from os.path import join
 from tqdm import tqdm
+from gensim.utils import deaccent
 from motel.cli.utils import custom_reader
 
 OUTPUT_HEADERS = ['id', 'tokens']
@@ -25,18 +29,20 @@ def filter_token(token):
 
 
 def process_token(token):
-    return token.lemma_.lower()
+    return deaccent(token.lemma_.lower())
 
 
 def preprocess_action(namespace):
 
     # NOTE: handle language later!
-    nlp = spacy.load('fr', disable=('ner', 'tagger', 'textcat', 'parser'))
-    nlp.add_pipe(nlp.create_pipe('sentencizer'))
+    nlp = spacy.load('fr', disable=('ner', 'tagger', 'textcat'))
+    # nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
     headers, pos, reader = custom_reader(namespace.file, namespace.column)
 
-    writer = csv.writer(namespace.output)
+    os.makedirs(namespace.output, exist_ok=True)
+
+    writer = csv.writer(join(namespace.output, 'sentences.csv'))
     writer.writerow(OUTPUT_HEADERS)
 
     loading_bar = tqdm(
@@ -45,6 +51,8 @@ def preprocess_action(namespace):
         dynamic_ncols=True,
         unit=' docs'
     )
+
+    vocab = Counter()
 
     for i, line in enumerate(reader):
         doc = nlp(line[pos])
@@ -58,5 +66,20 @@ def preprocess_action(namespace):
             if len(sentence) == 0:
                 continue
 
+            # Counting tokens
+            tokens = [process_token(token) for token in sentence]
+
+            for token in tokens:
+                vocab[token] += 1
+
             # Outputting a sentence
-            writer.writerow([i, '§'.join(process_token(token) for token in sentence)])
+            writer.writerow([i, '§'.join(tokens)])
+
+    # Outputting vocabulary
+    print('Writing vocabulary...')
+    with open(join(namespace.output, 'vocab.csv'), 'w') as vf:
+        writer = csv.writer()
+        writer.writerow(['word', 'count'])
+
+        for item, count in vocab.most_common():
+            writer.writerow([item, count])

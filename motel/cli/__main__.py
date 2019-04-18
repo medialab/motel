@@ -32,8 +32,7 @@ def main():
     preprocess.add_argument('-o',
         '--output',
         help='output file',
-        type=FileType('w'),
-        default=sys.stdout
+        default='./corpus'
     )
     preprocess.add_argument('-t',
         '--total',
