@@ -82,9 +82,14 @@ def preprocess_action(namespace):
     writer = csv.writer(sf)
     writer.writerow(OUTPUT_HEADERS)
 
+    total = namespace.total
+
+    if namespace.limit is not None and namespace.limit < total:
+        total = namespace.limit
+
     loading_bar = tqdm(
         desc='Preprocessing documents',
-        total=namespace.total,
+        total=total,
         dynamic_ncols=True,
         unit=' docs'
     )
@@ -98,6 +103,10 @@ def preprocess_action(namespace):
     for i, line, sentences, vocab in pool.imap_unordered(worker, generator):
         loading_bar.update()
 
+        if namespace.limit is not None and i >= namespace.limit - 1:
+            loading_bar.close()
+            break
+
         full_vocab += vocab
 
         for tokens in sentences:
@@ -108,7 +117,7 @@ def preprocess_action(namespace):
     # Outputting vocabulary
     print('Writing vocabulary...')
     with open(join(namespace.output, 'vocab.csv'), 'w') as vf:
-        writer = csv.writer()
+        writer = csv.writer(vf)
         writer.writerow(VOCAB_HEADERS)
 
         for item, count in full_vocab.most_common():

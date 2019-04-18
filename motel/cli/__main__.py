@@ -24,14 +24,19 @@ def main():
     )
     preprocess_subparser.add_argument(
         'file',
-        help='csv file to cluster',
+        help='CSV file decribing the corpus to preprocess.',
         type=FileType('r'),
         default=sys.stdin,
         nargs='?'
     )
-    preprocess_subparser.add_argument('-o',
-        '--output',
-        help='output file',
+    preprocess_subparser.add_argument(
+        '-l', '--limit',
+        help='Maximum number of line to consider. Useful to perform tests.',
+        type=int
+    )
+    preprocess_subparser.add_argument(
+        '-o', '--output',
+        help='Output directory.',
         default='./corpus'
     )
     preprocess_subparser.add_argument(
